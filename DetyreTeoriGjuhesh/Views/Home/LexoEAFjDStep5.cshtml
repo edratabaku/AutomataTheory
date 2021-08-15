@@ -1,0 +1,74 @@
+﻿@model DetyreTeoriGjuhesh.Models.Automat
+
+@{
+    ViewBag.Title = "LexoEAFjDStep5";
+}
+
+<h2 class="text-center">First state - Alphabet - Destination state relations</h2>
+<div class=".document">
+    <div id="divider_1">
+        <div class="row text-center">
+            <h4><u>First state</u></h4>
+        </div>
+        <div class="row text-center">
+            @foreach (var gjendjePara in Model.BashkesiaEGjendjeve)
+            {
+                @Html.RadioButton("GjendjePara", gjendjePara)
+                <label>@gjendjePara</label>
+            }
+        </div>
+        <div class="row text-center">
+            <h4><u>Input</u></h4>
+        </div>
+        <div class="row text-center">
+            @foreach (var input in Model.Alfabeti)
+            {
+                @Html.RadioButton("Input", input)
+                if (input == "eps")
+                {
+                    <label>Ɛ</label>
+                }
+                else
+                {
+                    <lable>@input</lable>
+                }
+            }
+        </div>
+        <div class="row text-center">
+            <h4><u>Destination State</u></h4>
+        </div>
+        <div class="row text-center">
+            @foreach (var gjendjePas in Model.BashkesiaEGjendjeve)
+            {
+                @Html.RadioButton("GjendjePas", gjendjePas)
+                <label>@gjendjePas</label>
+            }
+        </div>
+    </div>
+    <div class="row text-center">
+        <input type="button" value="Add relation" class="btn btn-success" onclick="ShtoKalim('divider_1')" />
+        @Html.ActionLink("Proceed", "ShfaqEAFjD", "Home", null, new { @class = "btn btn-warning" })
+    </div>
+</div>
+
+<script>
+    debugger;
+    var i = 2;
+    var ShtoKalim = function (divId) {
+        debugger;
+        var id = "#" + divId;
+        var selectedGjendjePara = $('input[name="GjendjePara"]:checked').val();
+        var selectedInput = $('input[name="Input"]:checked').val();
+        var selectedGjendjePas = $('input[name="GjendjePas"]:checked').val();
+        $.ajax({
+            type: "POST",
+            url: "/Home/ShtoKalim",
+            data: { gjendjePara: selectedGjendjePara, gjendjePas: selectedGjendjePas, input: selectedInput },
+            success: function (result) {
+                window.location.href = result.Url;
+            }
+        });
+    }
+</script>
+
+

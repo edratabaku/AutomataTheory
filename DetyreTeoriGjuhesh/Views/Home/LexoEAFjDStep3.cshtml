@@ -1,0 +1,34 @@
+﻿@model List<string>
+
+
+<h2 class="text-center">Specify the initial state:</h2>
+<br />
+<div class="text-center" id="#gjendjeDiv">
+    @foreach (var gjendje in Model)
+    {
+        <div class="row">
+            @Html.RadioButton("State", gjendje)
+            <label>@gjendje</label>
+        </div>
+    }
+    <br />
+    <input type="button" class="btn btn-success" value="Confirm and proceed to the next step(4/5)" onclick="ShtoGjendjeFillestare()" />
+</div>
+
+<script>
+    var ShtoGjendjeFillestare = function () {
+        debugger;
+        var selected = $('input[name="State"]:checked').val();
+        $.ajax({
+            type: "POST",
+            url: "/Home/VendosGjendjeFillestare",
+            data: { gjendjeFill: selected },
+            success: function (result) {
+                window.location.href = result.Url;
+            },
+            error: function (error) {
+                alert("You must specify a state.");
+            }
+        });
+    }
+</script>

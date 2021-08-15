@@ -1,0 +1,102 @@
+﻿
+@{
+    ViewBag.Title = "Alfabeti";
+}
+<h2 class="text-center">Enter the alphabet</h2>
+<h6 class="text-danger text-center">Warning! The program won't execute correctly if there are no characters in the alphabet.</h6>
+
+<br />
+<div class="container" id="mydiv">
+    <div class="row text-center">
+        <label>Enter a character</label>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-2">
+            <input type="text" id="text_1" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <input type="button" id="button_1" class="btn btn-success" value="Add character" onclick="ShtoKarakter('text_1','button_1')" />
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    <br />
+</div>
+<br />
+<div class="text-center">
+    <input type="button" id="proceed" class="btn btn-warning" onclick="HapiTjeter()" value="Proceed to the next step(3/5)" disabled />
+    @*@Html.ActionLink("Kalo ne hapin tjeter(3/5)", "LexoEAFjDStep3", "Home", null, new { @class = "btn btn-warning" })*@
+</div>
+<p id="result"><b>Alphabet:</b> </p>
+<div class="modal fade" id="errorModal" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <h4 class="modal-title text-success text-center" id="deletedModalLabel">The alphabet can only contain characters.</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var i = 2;
+    var ShtoKarakter = function (textId, buttonId) {
+        $("#proceed").attr('disabled', false);
+        debugger;
+        var id = "#" + textId;
+        var butid = "#" + buttonId;
+        var text = $(id).val();
+        if (text.length == 1) {
+            $.ajax({
+                type: "POST",
+                url: "/Home/ShtoKarakter",
+                data: { karakter: text },
+                success: function (result) {
+                    $(id).attr("disabled", "disabled");
+                    $(butid).hide();
+                    $("#mydiv").append("<div class=\"row text-center\"><div class=\"col-md-4\"></div><div class=\"col-md-2\"><input type=\"text\" id=\"text_" + i + "\" class=\"form-control\"/></div><div class=\"col-md-2\"><input type=\"button\" id=\"button_" + i + "\" class=\"btn btn-success\" value=\"Add character\" onclick=\"ShtoKarakter('text_" + i + "','button_" + i + "')\"/></div><div class=\"col-md-4\"></div></div><br/>");
+                    i++;
+                    $("#result").append(text + ",");
+                },
+                error: function (error) {
+                    alert("You can't enter more than one character.");
+                }
+            });
+        }
+        else {
+            $("#errorModal").modal('show');
+        }
+    }
+    function HapiTjeter() {
+        $.ajax({
+            type: "POST",
+            url: "/Home/KaloEAFjDStep3",
+            success: function (result) {
+                window.location.href = result.Url;
+            }
+        });
+        
+    }
+
+</script>
+
+<style>
+    @@media (min-width: 1200px) {
+        .container, .container-sm, .container-md, .container-lg, .container-xl {
+            max-width: 95%;
+        }
+
+        .modal-dialog {
+            max-width: 600px;
+        }
+    }
+</style>
+
+
+

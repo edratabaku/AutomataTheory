@@ -1,0 +1,76 @@
+﻿
+@{
+    ViewBag.Title = "LexoEAFjDStep1";
+}
+<h2 class="text-center">Enter the states</h2>
+<h6 class="text-danger text-center">Warning! The program won't execute correctly if there are no states.</h6>
+<br />
+<div class="container" id="mydiv">
+    <div class="row text-center">
+        <label>State name</label>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-2">
+            <input type="text" id="text_1" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <input type="button" id="button_1" class="btn btn-success" value="Add state" onclick="ShtoGjendje('text_1','button_1')" />
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    <br />
+</div>
+<br />
+<div class="text-center">
+    <input type="button" id="proceed" class="btn btn-warning" onclick="HapiTjeter()" value="Proceed to the next step (2/5)" disabled/>
+</div>
+<p id="result"><b>Current states:<b> </p>
+<script>
+    var i = 2;
+    var ShtoGjendje = function (textId, buttonId) {
+        debugger;
+        $("#proceed").attr('disabled', false);
+        var id = "#" + textId;
+        var butid = "#" + buttonId; 
+        var text = $(id).val();
+        $.ajax({
+            type: "POST",
+            url: "/Home/ShtoGjendje",
+            data: { gjendje: text },
+            success: function (result) {
+                $(id).attr("disabled","disabled");
+                $(butid).hide();
+                $("#mydiv").append("<div class=\"row text-center\"><div class=\"col-md-4\"></div><div class=\"col-md-2\"><input type=\"text\" id=\"text_" + i + "\" class=\"form-control\"/></div><div class=\"col-md-2\"><input type=\"button\" id=\"button_" + i + "\" class=\"btn btn-success\" value=\"Add state\" onclick=\"ShtoGjendje('text_" + i + "','button_" + i + "')\"/></div><div class=\"col-md-4\"></div></div><br/>");
+                i++;
+                $("#result").append(text + ",");
+            },
+            error: function (error) {
+                alert(error);
+            }
+        });
+    }
+    function HapiTjeter() {
+        $.ajax({
+            type: "POST",
+            url: "/Home/KaloEAFjDStep2",
+            success: function (result) {
+                window.location.href = result.Url;
+            }
+        });
+    }
+</script>
+
+<style>
+    @@media (min-width: 1200px) {
+        .container, .container-sm, .container-md, .container-lg, .container-xl {
+            max-width: 95%;
+        }
+
+        .modal-dialog {
+            max-width: 600px;
+        }
+    }
+</style>
+

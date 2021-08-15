@@ -1,0 +1,51 @@
+﻿@model IEnumerable<string>
+
+
+<h2 class="text-center">Add the final states</h2>
+<div class="row">
+    <div class="col-md-5">
+    </div>
+    <div class="col-md-5">
+        <div class="row">
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                <div class="col-md-1" id="div_@i">
+                    @Html.CheckBox(Model.ElementAt(i), new { @id = "check_" + @i, @class = "checkbox text-center", @value = Model.ElementAt(i) })
+                    <label>@Model.ElementAt(i)</label>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-md-2">
+    </div>
+</div>
+<div class="row text-center">
+    <div class="col-md-12">
+        @Html.ActionLink("Proceed to the next step (5/5)", "LexoEAFjDStep5", "Home", null, new { @class = "btn btn-warning" })
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+<script>
+    $(".checkbox").each(function () {
+        $(this).on("change", function () {
+            var id = $(this).attr("id");
+            var checked = $(this).attr('name');
+            $.ajax({
+                type: "POST",
+                url: "/Home/VendosGjendjeFundore",
+                data: { gjendjeFund: checked },
+                success: function (result) {
+                    var number = id.toString().substring(6, 7);
+                    var divid = "#div_" + number;
+                    $(divid).css("visibility", "hidden");
+                },
+                error: function (error) {
+                    alert("You must specify at least one final state");
+                }
+            });
+        });
+    });
+
+</script>
