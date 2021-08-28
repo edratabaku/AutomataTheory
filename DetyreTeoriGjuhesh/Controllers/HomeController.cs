@@ -8,10 +8,13 @@ using System.Web.Mvc;
 
 namespace DetyreTeoriGjuhesh.Controllers
 {
+    /// <summary>
+    /// Home Controller
+    /// </summary>
     public class HomeController : Controller
     {
         #region Inicializime
-        //Inicializimi i automateve si statike
+        //Initializing all automatas
         public static Automat Eafjd = new Automat()
         {
             Id = 1,
@@ -53,41 +56,61 @@ namespace DetyreTeoriGjuhesh.Controllers
             Kalimet = new List<Kalim>()
         };
         #endregion
+        /// <summary>
+        /// Parameterless constructor of the Home controller
+        /// </summary>
         public HomeController() { }
-        #region Paraqitje
-        public ActionResult Index()
-        {
-            return View();
-        }
-        //Shfaq 5shen per automatin e-afjd
+        #region Display
+        /// <summary>
+        /// Displays the data entered by the user for the Epsilon-NFA
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ShfaqEAFjD()
         {
             return View("ShfaqAutomat", Eafjd);
         }
-        //Shfaq 5shen per automatin afjd
+        /// <summary>
+        /// Displays data after converting the Epsilon-NFA to NFA
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ShfaqAFjD()
         {
             EafjdToAfjd();
             return View("ShfaqAutomat", Afjd);
         }
-        //Shfaq 5shen per automatin afd
+        /// <summary>
+        /// Displays data after converting the NFA to DFA
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ShfaqAFD()
         {
             AfjdToAfd();
             return View("ShfaqAutomat", Afd);
         }
+        /// <summary>
+        /// Displays data after converting the DFA to Minimal DFA
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ShfaqAFDMinimal()
         {
             AfdToAfdMinimal();
             return View("ShfaqAutomat", AfdMinimal);
         }
         #endregion
-        #region Leximi i te dhenave EAFjD
+        #region Epsilon-NFA input
+        /// <summary>
+        /// Returns a view that initializes the user input reading process
+        /// </summary>
+        /// <returns></returns>
         public ActionResult LexoEAFjDStep1()
         {
             return View();
         }
-        //Shton nje gjendje te re ne bashkesine e gjendjeve te automatit eafjd
+        /// <summary>
+        /// Adds a new state to the Epsilon-NFA 
+        /// </summary>
+        /// <param name="gjendje">The new state entered by the user</param>
+        /// <returns></returns>
         public JsonResult ShtoGjendje(string gjendje)
         {
             gjendje = gjendje.Trim().ToLower();
@@ -95,11 +118,13 @@ namespace DetyreTeoriGjuhesh.Controllers
             {
                 foreach (var gj in Eafjd.BashkesiaEGjendjeve)
                 {
+                    //if the state already exists, return
                     if (gj.ToLower() == gjendje.ToLower())
                     {
                         return Json(new { status = "Success" });
                     }
                 }
+                //if the state does not exist, add to the states list
                 Eafjd.BashkesiaEGjendjeve.Add(gjendje);
                 return Json(new { status = "Success" });
             }
@@ -109,20 +134,33 @@ namespace DetyreTeoriGjuhesh.Controllers
                 return Json(new { status = "Success" });
             }
         }
+        /// <summary>
+        /// Used to send us to the second step of reading data for the Epsilon-NFA
+        /// </summary>
+        /// <returns></returns>
         public JsonResult KaloEAFjDStep2()
         {
             var redirectUrl = new UrlHelper(Request.RequestContext).Action("LexoEAFjDStep2", "Home");
             return Json(new { Url = redirectUrl });
         }
+        /// <summary>
+        /// The second step of reading data to build the Epsilon-NFA  
+        /// </summary>
+        /// <returns></returns>
         public ActionResult LexoEAFjDStep2()
         {
             return View();
         }
-        //Shton nje karakter ne alfabetin e automatit eafjd
+        /// <summary>
+        /// Adds a new character the alphabet for Epsilon-NFA
+        /// </summary>
+        /// <param name="karakter"></param>
+        /// <returns></returns>
         public JsonResult ShtoKarakter(string karakter)
         {
             try
             {
+                //only add character to the alfphabet if it doesn't exist
                 if (!Eafjd.Alfabeti.Contains(karakter))
                 {
                     Eafjd.Alfabeti.Add(karakter);
@@ -134,17 +172,29 @@ namespace DetyreTeoriGjuhesh.Controllers
                 return Json(new { message = "Nuk mund te vendosen disa karaktere." });
             }
         }
+        /// <summary>
+        /// Method that sends us to the third step of reading data for the Epsilon-NFA
+        /// </summary>
+        /// <returns></returns>
         public JsonResult KaloEAFjDStep3()
         {
             var redirectUrl = new UrlHelper(Request.RequestContext).Action("LexoEAFjDStep3", "Home");
             return Json(new { Url = redirectUrl });
         }
+        /// <summary>
+        /// The third step to build the Epsilon-NFA
+        /// </summary>
+        /// <returns></returns>
         public ActionResult LexoEAFjDStep3()
         {
             List<string> Gjendjet = Eafjd.BashkesiaEGjendjeve;
             return View(Gjendjet);
         }
-        //Vendos gjendjen fillestare te automatit eafjd
+        /// <summary>
+        /// Adds a state as the initial state of the Epsilon-NFA
+        /// </summary>
+        /// <param name="gjendjeFill">The initial state for the epsilon-NFA</param>
+        /// <returns></returns>
         public JsonResult VendosGjendjeFillestare(string gjendjeFill)
         {
             Eafjd.GjendjaFillestare = gjendjeFill;
@@ -152,23 +202,37 @@ namespace DetyreTeoriGjuhesh.Controllers
             var redirectUrl = new UrlHelper(Request.RequestContext).Action("LexoEAFjDStep4", "Home");
             return Json(new { status = "Success", Url = redirectUrl });
         }
+        /// <summary>
+        /// The fourth step of building the Epsilon-NFA
+        /// </summary>
+        /// <returns></returns>
         public ActionResult LexoEAFjDStep4()
         {
             List<string> Gjendjet = Eafjd.BashkesiaEGjendjeve;
             return View(Gjendjet);
         }
-        //Shton gjendje fundore per automatin eafjd
+        /// <summary>
+        /// Adds a state as a final state of the Epsilon-NFA
+        /// </summary>
+        /// <param name="gjendjeFund">The state that will be added as a final state for the Epsilon-NFA</param>
+        /// <returns></returns>
         public JsonResult VendosGjendjeFundore(string gjendjeFund)
         {
             var res = Eafjd.BashkesiaEGjendjeve.Where(gjend => gjend.ToLower().Equals(gjendjeFund.ToLower())).FirstOrDefault();
             Eafjd.GjendjetFundore.Add(res);
             return Json(new { status = "Success" });
         }
+        /// <summary>
+        /// The final step for building the Epsilon-NFA
+        /// </summary>
+        /// <returns></returns>
         public ActionResult LexoEAFjDStep5()
         {
             return View(Eafjd);
         }
-        //Shton epsilonin ne alfabet dhe shton kalimin me epsilon per cdo gjendje tek vetvetja
+        /// <summary>
+        /// Adds epsilon to the alphabet and adds the state--epsilon-->state path for each state
+        /// </summary>
         public void ShtoEpsilon()
         {
             Eafjd.Alfabeti.Add("eps");
@@ -182,7 +246,13 @@ namespace DetyreTeoriGjuhesh.Controllers
                 });
             }
         }
-        //Shton nje kalim per automatin eafjd ku cdo kalim ruan gjendjen paraardhese, gjendjen pasardhese dhe inputin
+        /// <summary>
+        /// Adds a new path for the Epsilon-NFA
+        /// </summary>
+        /// <param name="gjendjePara">The first state</param>
+        /// <param name="gjendjePas">The second state</param>
+        /// <param name="input">Input needed to change the state from the first one to the second</param>
+        /// <returns></returns>
         public JsonResult ShtoKalim(string gjendjePara, string gjendjePas, string input)
         {
             Kalim kalimIRi = new Kalim()
@@ -200,15 +270,14 @@ namespace DetyreTeoriGjuhesh.Controllers
             return Json(new { status = "Success", Url = redirectUrl });
         }
         #endregion
-        #region Konvertime
-        #region EafjdtoAfjd
-        //Metoda qe konverton automatin eafjd ne automat afjd
+        #region Conversions
+        #region Epsilon-NFA to NFA
         public void EafjdToAfjd()
         {
             List<MbylljaEpsilon> mbylljetEpsilon = new List<MbylljaEpsilon>();
             List<MbylljaEpsilonInput> mbylljetEpsilonInput = new List<MbylljaEpsilonInput>();
             List<MbylljaEpsilonInputEpsilon> mbylljetEpsilonInputEpsilon = new List<MbylljaEpsilonInputEpsilon>();
-            //Llogaritet mbyllja epsilon per cdo gjendje (cilat jane gjendjet qe arrin vetem duke pare epsilon)
+            //Calculate the epsilon-closure for each state (the states it can go to by epsilon only)
             foreach (var gjendje in Eafjd.BashkesiaEGjendjeve)
             {
                 MbylljaEpsilon mbyllje = new MbylljaEpsilon()
@@ -221,7 +290,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                 mbyllje.gjendjetFundStep1 = gjendjeFund;
                 mbylljetEpsilon.Add(mbyllje);
             }
-            //per cdo karakter jo epsilon te alfabetit llogarisim ku shkojne gjendjet e marra nga mbyllja epsilon e gjendjeve te automatit
+            // foreach character that is not epsilon, calculate at what state the result states of the epsilon closure will go to
             foreach (var input in Eafjd.Alfabeti)
             {
                 if (input.ToLower() != "eps")
@@ -247,12 +316,11 @@ namespace DetyreTeoriGjuhesh.Controllers
                     }
                 }
             }
-            //per cdo gjendje qe morem nga hapi i mesiperm llogarisim ku shkon gjendja nese sheh vetem epsilon 
+            //foreach result state of the above mentioned step, check whats the result state by only seeing epsilon
             foreach (var mbyllje in mbylljetEpsilonInput)
             {
                 MbylljaEpsilonInputEpsilon mbylljaEpsilonInputEpsilon = new MbylljaEpsilonInputEpsilon()
                 {
-                    //MbylljaEpsilonInput = mbyllje,
                     gjendjaFill = mbyllje.gjendjaFill,
                     Input = mbyllje.Input,
                     GjendjetFund = new List<string>()
@@ -268,13 +336,13 @@ namespace DetyreTeoriGjuhesh.Controllers
                 }
                 mbylljetEpsilonInputEpsilon.Add(mbylljaEpsilonInputEpsilon);
             }
-            //bashkesia e gjendjeve te automatit afjd do jete njesoj si ajo e automatit afjd
+            //the nfa will have the same states as the epsilon-nfa
             Afjd.BashkesiaEGjendjeve = Eafjd.BashkesiaEGjendjeve;
-            //alfabeti per automatin afjd eshte i njejte me ate te automatit eafjd pa perfshire epsilon
+            //the alphabet for the nfa will be the same one as the one for the epsilon-nfa but without the epsilon
             Afjd.Alfabeti = Eafjd.Alfabeti.Where(karakter => karakter != "eps").ToList();
-            //gjendja fillestare per automatin afjd do jete e njejte me ate te automatit eafjd
+            //the nfa has the same initial state as the epsilon-nfa
             Afjd.GjendjaFillestare = Eafjd.GjendjaFillestare;
-            //vendosim kalimet per automatin afjd
+            //paths for the nfa
             foreach (var mbyllje in mbylljetEpsilonInputEpsilon)
             {
                 string gjendjeEPare = mbyllje.gjendjaFill;
@@ -290,7 +358,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                     Afjd.Kalimet.Add(kalimIRi);
                 }
             }
-            //caktojme gjendjet fundore te automatit afjd
+            //determine the final states for the nfa
             foreach (var gjendje in Eafjd.BashkesiaEGjendjeve)
             {
                 List<string> afjdGjendjetFundore = new List<string>();
@@ -301,11 +369,17 @@ namespace DetyreTeoriGjuhesh.Controllers
                 }
             }
         }
-        //Metoda qe na ndihmon te gjejme cilat gjendje arrin nje gjendje vetem duke pare epsilon
+        /// <summary>
+        /// Method that helps us find where each state goes by only seeing epsilon
+        /// </summary>
+        /// <param name="gjendje">the start state</param>
+        /// <param name="gjendjeFund">the end states</param>
+        /// <param name="llogaritur">list of already calculated states</param>
         public void LlogaritMeEpsilon(string gjendje, List<string> gjendjeFund, List<string> llogaritur)
         {
-            llogaritur.Add(gjendje);
-            var kalimet = Eafjd.Kalimet.Where(kalim => kalim.GjendjaEPare.ToLower() == gjendje.ToLower() && kalim.Input.ToLower() == "eps");
+            llogaritur.Add(gjendje); //add to the list of already calculated states
+            //find where the start state goes with the input of epsilon
+            var kalimet = Eafjd.Kalimet.Where(kalim => kalim.GjendjaEPare.ToLower() == gjendje.ToLower() && kalim.Input.ToLower() == "eps"); 
             foreach (var gjendjeF in kalimet.Select(kalim => kalim.GjendjaEDyte))
             {
                 if (!gjendjeFund.Contains(gjendjeF))
@@ -315,7 +389,12 @@ namespace DetyreTeoriGjuhesh.Controllers
             }
 
         }
-        //metode qe na ndihmon te gjejme gjendjet fundore te afjd duke pare nese nje gjendje arrin gjendjen fundore te automatit eafjd duke pare vetem epsilon
+        /// <summary>
+        /// Method that helps us find the final states of the nfa by checking if a state can get to the final state of the epsilon-nfa by only seeing epsilon
+        /// </summary>
+        /// <param name="gjendje">the state we're running a check for</param>
+        /// <param name="afjdGjendjetFundore">the list of the final states of the epsilon-nfa</param>
+        /// <returns></returns>
         public bool GjendjetFundoreTeAfjd(string gjendje, List<string> afjdGjendjetFundore)
         {
             afjdGjendjetFundore.Add(gjendje);
@@ -339,29 +418,31 @@ namespace DetyreTeoriGjuhesh.Controllers
             return false;
         }
         #endregion
-        #region AfjdToAfd
-        //konvertimi i automatit nga afjd ne afd
+        #region NFA to DFA
+        /// <summary>
+        /// The conversion of NFA to DFA
+        /// </summary>
         public void AfjdToAfd()
         {
             List<string> gjendjetAfd = new List<string>();
             List<Kalim> kalimetAfd = new List<Kalim>();
-            //vendosim si gjendje, gjendjen fillestare te automatit afjd
+            //add as a state for DFA, the start state of the NFA
             gjendjetAfd.Add(Afjd.GjendjaFillestare);
-            //shtojme nje gjendje errori ne rast se do te kemi gjendje qe nuk kane nje gjendje pasardhese per nje input te caktuar
+            // add an error state in case we have states that do not arrive to a state by seeing a certain input
             string gjendjeError = "Gjendje error";
             gjendjetAfd.Add(gjendjeError);
             for (int i = 0; i < gjendjetAfd.Count(); i++)
             {
-                //llogaritja do te behet per cdo gjendje pervec gjendjes se errorit pasi pas errorit nuk mund te shkojme ne nje gjendje tjeter
+                //the calculation that  will be made for each state except the error state, since from the error state we can't go to any other state
                 if (gjendjetAfd[i] != gjendjeError)
                 {
                     foreach (var input in Afjd.Alfabeti)
                     {
-                        //nese gjendja eshte pjese e basheksise se gjendjeve te automatit afjd
+                        //if the state is a part of the nfa states
                         if (Afjd.BashkesiaEGjendjeve.Contains(gjendjetAfd[i]))
                         {
                             var kalimet = Afjd.Kalimet.Where(kalim => kalim.GjendjaEPare == gjendjetAfd[i] && kalim.Input == input);
-                            //nese per nje input shkojme vetem ne nje gjendje, shtojme kalimin dhe shtojme gjendjen te gjendjet e afd nese ajo nuk eshte shtuar me pare
+                            //if for an input we only go to one state, add the path and add the state to the dfa states, if it hasn't already been added
                             if (kalimet.Count() == 1)
                             {
                                 kalimetAfd.Add(new Kalim()
@@ -373,7 +454,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                                 if (!gjendjetAfd.Contains(kalimet.FirstOrDefault().GjendjaEDyte))
                                     gjendjetAfd.Add(kalimet.FirstOrDefault().GjendjaEDyte);
                             }
-                            //nese per nje input shkojme me shume se ne nje gjendje krijohet gjendja e re dhe kalimi
+                            //if for an input we go to more than a state, we create a new state and add the corresponding path
                             else if (kalimet.Count() > 1)
                             {
                                 string gjendjeERe = "";
@@ -395,7 +476,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                                     Input = input
                                 });
                             }
-                            //nese nuk ka nje kalim shkojme ne gjendje errori
+                            //if there's no path go to the error state
                             else
                             {
                                 kalimetAfd.Add(new Kalim()
@@ -405,18 +486,18 @@ namespace DetyreTeoriGjuhesh.Controllers
                                     Input = input
                                 });
                             }
-                            //nese eshte gjendje fundore ne afjd vendose si gjendje fundore dhe per afd
+                            //if it's a final state for the nfa it's also a final state for the dfa
                             if (Afjd.GjendjetFundore.Contains(gjendjetAfd[i]))
                                 Afd.GjendjetFundore.Add(gjendjetAfd[i]);
                         }
-                        //nese gjendja eshte nje gjendje e re
+                        //if the state is a new state
                         else
                         {
                             try
                             {
                                 char test = Convert.ToChar(Afjd.GjendjaFillestare);
                                 string gjendja = gjendjetAfd[i];
-                                //llogarisim per cdo gjendje qe perben gjendjen e re se ku shkon ajo per inputin e caktuar
+                                //calculate where does each state that makes up the new state go for a certain input
                                 List<Kalim> kalimetTotale = new List<Kalim>();
                                 for (int j = 0; j < gjendja.Length; j++)
                                 {
@@ -431,7 +512,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                                 {
                                     gjendjaPasardhese += kalimetPerInput.ElementAt(k);
                                 }
-                                //nqs ka nje gjendjePasardhese
+                                //if there's an end state
                                 if (kalimetPerInput.Count() >= 1)
                                 {
                                     kalimetAfd.Add(new Kalim()
@@ -443,7 +524,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                                     if (!gjendjetAfd.Contains(gjendjaPasardhese))
                                         gjendjetAfd.Add(gjendjaPasardhese);
                                 }
-                                //nese nuk ka, gjendja pasardhese do jete gjendja e errorit
+                                //if not, go to the error state
                                 else
                                 {
                                     kalimetAfd.Add(new Kalim()
@@ -495,7 +576,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                         }
                     }
                 }
-                //nese gjendja eshte gjendja e errorit per cdo input do qendrojme ne gjendje errori
+                //if the state is the error state, for each input add the path that leads to itself
                 else
                 {
                     foreach (var input in Afjd.Alfabeti)
@@ -509,7 +590,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                     }
                 }
             }
-            //nqs gjendja permban nje gjendje fundore te automatit afjd, do jete gjendje fundor per afd
+            // if the state contains an end state of the nfa, it'll be an end state for the dfa
             foreach (var gjendje in gjendjetAfd)
             {
                 try
@@ -543,7 +624,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                     }
                 }
             }
-            //nese asnje nga gjendjet nuk shkon ne gjendje errori, atehere e heqim gjendjen e errorit dhe kalimet qe ka gjendja e errorit
+            //if none of the states goes to an error state, then remove the error state and all the paths that lead to it
             if (kalimetAfd.Where(kalim => kalim.GjendjaEDyte == gjendjeError && kalim.GjendjaEPare != gjendjeError).Count() == 0)
             {
                 for (int i = 0; i < kalimetAfd.Count(); i++)
@@ -563,13 +644,15 @@ namespace DetyreTeoriGjuhesh.Controllers
             Afd.Kalimet = kalimetAfd;
         }
         #endregion
-        #region AfdToAfdMinimal
-        //funksioni qe konverton automatin e fundem determinist ne automat te fundem determinist minimal
+        #region Minimizing the DFA
+        /// <summary>
+        /// Method that minimizes the DFA
+        /// </summary>
         public void AfdToAfdMinimal()
         {
             var gjendjet = new List<GjendjeSeti>();
             var setet = new List<Set>();
-            //heqim gjendjet e pakapshme dhe marrim vetem gjendjet e kapshme
+            //remove all the unreachable states
             foreach (var gjendje in Afd.BashkesiaEGjendjeve)
             {
                 if ((Afd.Kalimet.Select(gj => gj.GjendjaEDyte).Contains(gjendje) || Afd.GjendjaFillestare == gjendje))
@@ -584,14 +667,14 @@ namespace DetyreTeoriGjuhesh.Controllers
                 }
 
             }
-            //krijojme setin e gjendjeve fundore
+            //create the set of the final states
             var setGjendjeFundore = gjendjet.Where(gjendje => gjendje.EshteGjendjeFundore == true).ToList();
-            //krijojme setin e gjendjeve jofundore
+            //create the set of the non-final states
             var setGjendjeJoFundore = gjendjet.Where(gjendje => gjendje.EshteGjendjeFundore == false).ToList();
             setet.Add(new Set() { gjendjetESetit = setGjendjeJoFundore });
             setet.Add(new Set() { gjendjetESetit = setGjendjeFundore });
             var setetEReja = Minimizimi(setet);
-            //gjendjet e reja te automatit minimal do jene gjendjet sipas seteve pas perfundimit te minimizimit
+            //the new states of the minimal-DFA will be the states of the sets after the minimization process
             foreach (var set in setetEReja)
             {
                 string gjendjaERe = "";
@@ -614,7 +697,7 @@ namespace DetyreTeoriGjuhesh.Controllers
         }
         public List<Set> Minimizimi(List<Set> setet)
         {
-            //fillimisht asnje nga gjendjet nuk i perket asnje seti te ri
+            //initially none of the states belongs to a set
             foreach (var set in setet)
             {
                 foreach (var gjendje in set.gjendjetESetit)
@@ -624,20 +707,20 @@ namespace DetyreTeoriGjuhesh.Controllers
                 }
             }
             int idSet = 0;
-            //setet e reja qe do sherbejne si sete fillestare per perseritjen e ketij funksioni
+            //the new sets will serve as initial sets for the repetition of this function
             List<Set> setetEReja = new List<Set>();
-            //algoritmi do te marri fund kur nuk do kete me ndryshime
+            //the algorithm will end when there are no longer any changes to the sets
             bool changes = false;
-            //per cdo set
+            //for each set
             foreach (var set in setet)
             {
-                //per cdo set me me shume se nje gjendje
+                //for each set with more than a state
                 if (set.gjendjetESetit.Count != 1)
                 {
-                    //per cdo gjendje te setit
+                    //for each state of the set
                     for (int i = 0; i < set.gjendjetESetit.Count(); i++)
                     {
-                        //nqs jemi ne gjendjen e pare krijojme nje set te ri qe ruan kete gjendje
+                        //if it'S the first state, create a new set to save this state
                         if (i == 0)
                         {
                             set.gjendjetESetit.ElementAt(i).SetMeVete = true;
@@ -659,15 +742,15 @@ namespace DetyreTeoriGjuhesh.Controllers
                         }
                         else
                         {
-                            //krahasojme gjendjen me paraardhesit e saj qe kane krijuar set me pare, pra vetem me nje element per cdo set te ri
+                            //compare the state with its ancestors within the set, so with only an element for each new set
                             for (int j = i - 1; j >= 0; j--)
                             {
                                 var gjendjeParaardhese = set.gjendjetESetit.ElementAt(j);
                                 if (gjendjeParaardhese.SetMeVete == true && set.gjendjetESetit.ElementAt(i).IdESetitKuNdodhet != null)
                                 {
-                                    //llogarisim nese gjendjet jane ne te njejtin set
+                                    //calculate if the states are in the same set
                                     bool neTeNjejtinSet = PjeseETeNjejtitSet(set.gjendjetESetit.ElementAt(i), gjendjeParaardhese, setet);
-                                    //nese po shtojme gjendjen ne setin perkates
+                                    //if yes, add to the set
                                     if (neTeNjejtinSet)
                                     {
                                         setetEReja.ElementAt(gjendjeParaardhese.IdESetitKuNdodhet.GetValueOrDefault()).gjendjetESetit.Add(set.gjendjetESetit.ElementAt(i));
@@ -675,7 +758,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                                     }
                                 }
                             }
-                            //nese id e setit te cilit i perket gjendja eshte null dmth qe gjendja do krijoje nje set te ri
+                            //if the identifier of the set where the state belongs is null, the state will create a new set
                             if (set.gjendjetESetit.ElementAt(i).IdESetitKuNdodhet == null)
                             {
                                 set.gjendjetESetit.ElementAt(i).SetMeVete = true;
@@ -701,7 +784,7 @@ namespace DetyreTeoriGjuhesh.Controllers
                         }
                     }
                 }
-                //nese gjendja eshte e vetme ne set, do krijohet seti qe mban vetem kete gjendje dhe nuk do behen modifikime ne te
+                //if the state is alone in a set, we'll create the set that only holds this state and there will be no other modifications in it
                 else
                 {
                     setetEReja.Add(new Set()
@@ -721,12 +804,12 @@ namespace DetyreTeoriGjuhesh.Controllers
                     idSet++;
                 }
             }
-            //nqs ka patur ndryshime therrit funksionin per setet e reja te krijuara
+            //if there were any changes call the function recursively for the new created sets
             if (changes) { return setetEReja = Minimizimi(setetEReja); }
-            //nqs jo kthe setet e reja
+            //if not return the new sets
             else return setetEReja;
         }
-        //funksioni qe sheh nese dy gjendje bejne pjese ne te njejtin set
+        //function checks if there are two states in the same set
         public bool PjeseETeNjejtitSet(GjendjeSeti gjendjaEPare, GjendjeSeti gjendjaEDyte, List<Set> setet)
         {
             int neNjeSetPer = 0;
@@ -750,6 +833,10 @@ namespace DetyreTeoriGjuhesh.Controllers
             }
             return true;
         }
+        /// <summary>
+        /// Creating the paths for the minimization of the DFA
+        /// </summary>
+        /// <param name="setet">list of the sets created during minimizing the DFA</param>
         public void KalimetAfdToAfdMinimal(List<Set> setet)
         {
             foreach (var set in setet)
@@ -801,11 +888,18 @@ namespace DetyreTeoriGjuhesh.Controllers
             }
         }
         #endregion
+        /// <summary>
+        /// Start the program from the beginning
+        /// </summary>
+        /// <returns></returns>
         public ActionResult EAFjDiRi()
         {
             KrijoTeRi();
             return View("LexoEAFjDStep1");
         }
+        /// <summary>
+        /// Method that empties the automatas from pre-existing data so that the program can start over again
+        /// </summary>
         public void KrijoTeRi()
         {
             Eafjd = new Automat()
